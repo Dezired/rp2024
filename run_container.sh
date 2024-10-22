@@ -2,9 +2,9 @@
 ##############################################################################
 ##                            Run the container                             ##
 ##############################################################################
-SRC_CONTAINER=/home/jovyan/workspace/src
+SRC_CONTAINER=/home/philipp/workspace/src
 SRC_HOST="$(pwd)"/src
-ASSETS_CONTAINER=/home/jovyan/workspace/assets
+ASSETS_CONTAINER=/home/philipp/workspace/assets
 ASSETS_HOST="$(pwd)"/assets
 
 docker run \
