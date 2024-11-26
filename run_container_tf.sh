@@ -4,9 +4,9 @@
 ##############################################################################
 tensorflow_version="2.11.0"
 
-SRC_CONTAINER=/home/jovyan/workspace/src
+SRC_CONTAINER=/home/philipp/workspace/src
 SRC_HOST="$(pwd)"/src
-DATA_CONTAINER=/home/jovyan/data
+DATA_CONTAINER=/home/philipp/data
 DATA_HOST="$(pwd)"/data
 
 docker run \
@@ -17,6 +17,8 @@ docker run \
   --net=host \
   -v "$SRC_HOST":"$SRC_CONTAINER":rw \
   -v "$DATA_HOST":"$DATA_CONTAINER":rw \
-  -e DISPLAY="$DISPLAY" \
+  -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/wslg:/mnt/wslg \
+  -e DISPLAY="$DISPLAY" -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+  -e PULSE_SERVER=$PULSE_SERVER \
   --gpus all \
  rp2024/tf:"$tensorflow_version"
