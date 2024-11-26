@@ -3,4 +3,4 @@ defaults:
   - default_workspace_bounds
 
 log_level: INFO
-data_root: "/home/jovyan/data"
+data_root: "/home/philipp/data"
