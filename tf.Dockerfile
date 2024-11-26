@@ -36,7 +36,7 @@ FROM tf-dependencies as tf-user
 RUN apt-get update && apt-get install -y sudo
 
 # Create user
-ARG USER=jovyan
+ARG USER=philipp
 ARG PASSWORD=automaton
 ARG UID=1000
 ARG GID=1000

@@ -5,4 +5,4 @@ defaults:
   - robot: ur10_cell
 
 log_level: INFO
-data_root: "/home/jovyan/data"
+data_root: "/home/philipp/data"
