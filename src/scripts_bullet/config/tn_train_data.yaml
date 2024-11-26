@@ -6,7 +6,7 @@ defaults:
   - _self_
 
 debug: false
-render: false
+render: true
 store_dataset: true
 dataset_directory: ${data_root}/datasets/tn_train_data
 
