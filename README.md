@@ -9,4 +9,5 @@ The workspace contains multiple objects of two different colors and areas corres
 view full Task under ``project\rp_Project_Assignment.pdf``
 
 ## Setup environment
-`pip install requirements.txt`
+- `pip install requirements.txt`
+- Download the [configuration file](project/cfg_example.yml) and place it in the `src` directory. Modify it as needed for your setup.
