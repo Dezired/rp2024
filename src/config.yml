@@ -1,0 +1,23 @@
+# Environment:
+COLOURS:
+  - green
+  - red
+OBJECT_FOLDERS:
+  - signs
+  - cubes
+PARTS:
+  - plus
+  - cube
+ROBOT_STATE_COUNT: 2 # x and y
+OBJECT_STATE_COUNT: 3 # x, y and rotation arround z
+GOAL_STATE_COUNT: 3 # x, y and rotation arround z
+MAX_OBJECT_PER_TYPE: 3
+
+# Train
+MAX_STEPS: 200
+TIMESTEPS: 10000
+MODEL: "DQN_normiert_small_observationspace_corrected_padding"
+
+# Simulation
+RENDER: true
+ASSETS_PATH: "/home/philipp/Documents/repos/rp2024/assets"
