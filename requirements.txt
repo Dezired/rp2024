@@ -43,6 +43,7 @@ Pygments==2.19.2
 pyparsing==3.2.5
 python-dateutil==2.9.0.post0
 pytz==2025.2
+PyYAML==6.0.3
 rich==14.2.0
 scipy==1.16.2
 setuptools==70.2.0
