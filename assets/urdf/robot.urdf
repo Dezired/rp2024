@@ -85,7 +85,13 @@
             package. Users CANNOT rely on this file being available, or stored in
             this location. Nor can they rely on the existence of the macro.
     -->
-    <link name="corrected_world"/>
+    <link name="corrected_world">
+        <inertial>
+            <origin xyz="0.43 0 -0.973" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
+    </link>
     <joint name="world_joint" type="fixed">
         <origin rpy="0 0 0" xyz="0.43 0 -0.973"/>
         <parent link="corrected_world"/>
@@ -98,6 +104,11 @@
         <child link="warehouse_link"/>
     </joint>
     <link name="warehouse_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
@@ -142,6 +153,11 @@
         <child link="platform_link"/>
     </joint>
     <link name="platform_link">
+        <inertial>
+            <origin xyz="0 0 -0.0125" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
         <visual>
             <origin rpy="0 0 0" xyz="0 0 -0.0125"/>
             <geometry>
@@ -195,6 +211,11 @@
     <!-- Placeholder for ros2_control transmission which don't yet exist -->
     <!-- links -  main serial chain -->
     <link name="base_link"/>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        </inertial>
     <link name="base_link_inertia">
         <visual>
             <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
@@ -407,6 +428,11 @@
         <dynamics damping="0" friction="0"/>
     </joint>
     <link name="ft_frame"/>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        </inertial>
     <joint name="wrist_3_link-ft_frame" type="fixed">
         <parent link="wrist_3_link"/>
         <child link="ft_frame"/>
@@ -414,6 +440,11 @@
     </joint>
     <!-- ROS-Industrial 'base' frame - base_link to UR 'Base' Coordinates transform -->
     <link name="base"/>
+            <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        </inertial>
     <joint name="base_link-base_fixed_joint" type="fixed">
         <!-- Note the rotation over Z of pi radians - as base_link is REP-103
                aligned (i.e., has X+ forward, Y+ left and Z+ up), this is needed
@@ -426,6 +457,11 @@
     </joint>
     <!-- ROS-Industrial 'flange' frame - attachment point for EEF models -->
     <link name="flange"/>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        </inertial>
     <joint name="wrist_3-flange" type="fixed">
         <parent link="wrist_3_link"/>
         <child link="flange"/>
@@ -433,5 +469,10 @@
     </joint>
     <!-- ROS-Industrial 'tool0' frame - all-zeros tool frame -->
     <link name="tool0"/>
-    
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        </inertial>
+    </link>
 </robot>
