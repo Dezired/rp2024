@@ -74,12 +74,10 @@ class BulletRobot:
         self.step()
         self.bullet_client.stepSimulation()
 
-    def step(self,
-             gain=0.033,
-             velocity=0.15,
-             precision=0.0015) -> None:
-        current_position = [self.bullet_client.getJointState(self.robot_id, i)[0] for i in self.controllable_joints]
-        current_position = np.array(current_position)
+    def step(self, gain=0.033, velocity=0.15, precision=0.0015) -> bool:
+        advanced = False
+        current_position = np.array([self.bullet_client.getJointState(self.robot_id, i)[0]
+                                    for i in self.controllable_joints])
         difference = self.target_joint_positions - current_position
 
         gains = np.ones(len(self.controllable_joints)) * gain

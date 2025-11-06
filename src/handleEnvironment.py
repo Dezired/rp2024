@@ -169,27 +169,28 @@ class HandleEnvironment():
 
     def performAction(self, action):
         current_pose = self.robot.get_eef_pose()
-        fixed_orientation = [-np.pi, 0, np.pi/2]
+        print(f"Current Pose: {current_pose.translation}, {current_pose.quat}")
+        # Move 1 cm in XY
+        dx, dy = {
+            0: (-0.01,  0.0),  # left
+            1: ( 0.01,  0.0),  # right
+            2: ( 0.0,   0.01), # forward
+            3: ( 0.0,  -0.01), # backward
+        }.get(action, (0.0, 0.0))
+        if dx == dy == 0.0:
+            return
 
-        if action == 0:  # Move left
-            new_x = current_pose.translation[0] - 0.01
-            new_y = current_pose.translation[1]
-        elif action == 1:  # Move right
-            new_x = current_pose.translation[0] + 0.01
-            new_y = current_pose.translation[1]
-        elif action == 2:  # Move forward
-            new_x = current_pose.translation[0]
-            new_y = current_pose.translation[1] + 0.01
-        elif action == 3:  # Move backward  
-            new_x = current_pose.translation[0]
-            new_y = current_pose.translation[1] - 0.01
-        else:
-            return  # Invalid action
+        # OPTION A: keep the current orientation (usually best to avoid IK flips)
+        fixed_quat = current_pose.quat  # xyzw
 
-        # Create a new target pose with updated x and y, keeping z the same and setting the fixed orientation
+        # OPTION B: if you truly want a hard-coded tool pose, convert Euler->quat once:
+        # fixed_quat = Rotation.from_euler('xyz', [-np.pi, 0, np.pi/2]).as_quat()  # xyzw
+
         target_pose = Affine(
-            translation=[new_x, new_y, -0.1],  # Keep z the same
-            rotation=fixed_orientation  # Set the fixed orientation
+            translation=[current_pose.translation[0] + dx,
+                        current_pose.translation[1] + dy,
+                        -0.1],   # keep z exactly the same
+            rotation=fixed_quat
         )
         self.robot.lin(target_pose)
     

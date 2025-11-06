@@ -1,7 +1,7 @@
 import gymnasium as gym
 import numpy as np
 import yaml
-
+from pprint import pprint
 
 class sortingViaPushingEnv(gym.Env):
 	"""Custom Environment that follows gym interface"""
@@ -32,7 +32,7 @@ class sortingViaPushingEnv(gym.Env):
 		if self.stepCount >= self.cfg['MAX_STEPS']-1:
 			self.truncated = True
 		info = {'Step': self.stepCount, 'Reward': self.reward, 'Action': action, 'Terminated': self.terminated, 'Truncated': self.truncated}
-		print(info)
+		pprint(info)
 		self.stepCount += 1
 		observation = self.hdlEnv.getStates()
 		#observation = self.calcReward.getStatePositions()

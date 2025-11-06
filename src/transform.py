@@ -166,7 +166,6 @@ class Affine:
         steps = [Affine(t, r.as_quat()) for t, r in zip(t_steps, r_steps)]
         return steps
 
-
 if __name__ == '__main__':
 
     a_1 = Affine(translation=(1, 1, 0), rotation=[0, 0, np.pi / 2])
