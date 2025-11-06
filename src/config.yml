@@ -1,17 +1,17 @@
 # Environment:
 COLOURS:
   - green
-  - red
+  # - red
 OBJECT_FOLDERS:
-  - signs
+  # - signs
   - cubes
 PARTS:
-  - plus
+  # - plus
   - cube
 ROBOT_STATE_COUNT: 2 # x and y
-OBJECT_STATE_COUNT: 3 # x, y and rotation arround z
-GOAL_STATE_COUNT: 3 # x, y and rotation arround z
-MAX_OBJECT_PER_TYPE: 3
+OBJECT_STATE_COUNT: 4 # x, y and rotation arround z (sin+cos)
+GOAL_STATE_COUNT: 4 # x, y and rotation arround z (sin+cos)
+MAX_OBJECT_PER_TYPE: 1
 
 # Train
 MAX_STEPS: 200
