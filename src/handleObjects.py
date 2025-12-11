@@ -5,10 +5,6 @@ from transform import Affine
 
 class HandleObjects():
     def __init__(self, cfg):
-        self.tableCords = {
-                    'x':[0.3, 0.9], # min, max
-                    'y':[-0.29, 0.29]
-                    }
         self.objectWidth = 0.05
         self.goalWidths = {
                             'x': 3*self.objectWidth + 0.01, # numb*min_size_object + offset --> 9 objets fit in goal
@@ -33,8 +29,8 @@ class HandleObjects():
     def generate_valid_position(self, existing_positions, min_safety_distance=0.1, max_attempts=100):
         '''Generate a random position that doesn't collide with existing objects'''
         for _ in range(max_attempts):
-            x = np.random.uniform(self.tableCords['x'][0], self.tableCords['x'][1])
-            y = np.random.uniform(self.tableCords['y'][0], self.tableCords['y'][1])
+            x = np.random.uniform(self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+            y = np.random.uniform(self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
             z = 0.1
             if not self.check_collision([x, y, z], existing_positions, min_safety_distance):
                 return [x, y, z]
@@ -82,10 +78,10 @@ class HandleObjects():
 
     
     # Goals:
-    def generate_single_goal_area(self, table_coords, goal_width):
+    def generate_single_goal_area(self, goal_width):
         """Generate coordinates for a single goal area inside the table with respect to the width of the rectangle"""
-        x_goal_min = np.random.uniform(table_coords['x'][0], table_coords['x'][1] - goal_width['x'])
-        y_goal_min = np.random.uniform(table_coords['y'][0], table_coords['y'][1] - goal_width['y'])
+        x_goal_min = np.random.uniform(self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'] - goal_width['x'])
+        y_goal_min = np.random.uniform(self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'] - goal_width['y'])
         x_goal_max = x_goal_min + goal_width['x']
         y_goal_max = y_goal_min + goal_width['y']
         return (x_goal_min, y_goal_min, x_goal_max, y_goal_max)
@@ -111,8 +107,8 @@ class HandleObjects():
     def generateGoals(self, z_goal = -0.01, max_attempts=100):
         '''Generate two non-overlapping goal areas. Returns False if unable to generate non-overlapping areas after max_attempts.'''
         for _ in range(max_attempts):
-            goal1_coords = self.generate_single_goal_area(self.tableCords, self.goalWidths) # generate goal area
-            goal2_coords = self.generate_single_goal_area(self.tableCords, self.goalWidths) 
+            goal1_coords = self.generate_single_goal_area(self.goalWidths) # generate goal area
+            goal2_coords = self.generate_single_goal_area(self.goalWidths) 
             if not self.check_rectangle_overlap(goal1_coords, goal2_coords):
                 goal1_pose = self.generate_goal_pose(goal1_coords, z_goal) # generates pose for goal area center
                 goal2_pose = self.generate_goal_pose(goal2_coords, z_goal)

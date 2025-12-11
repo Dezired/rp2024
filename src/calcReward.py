@@ -1,13 +1,14 @@
 import numpy as np
 
 class CalcReward():
-    def __init__(self, handleEnv):
+    def __init__(self, cfg, handleEnv):
         self.handleEnv = handleEnv
         self.distRobToGoal, self.distObjToGoal, self.distRobToObj  = None, None, None
         self.prevDistRobToGoal, self.prevDistObjToGoal, self.prevDistRobToObj = None, None, None
         self.nearObjectID, self.prevNearObjectID = None, None
         self.score = 0
         self.positions = self.handleEnv.getPositions()
+        self.cfg = cfg
 
     def reset(self):
         self.distRobToGoal, self.distObjToGoal, self.distRobToObj  = None, None, None
@@ -70,12 +71,12 @@ class CalcReward():
         return minDistance, self.nearObjectID
 
     def getDistObjToGoal(self, objID):
-        objName, objPos = next(((obj, pos[objID]) for (obj, pos) in self.positions.items() if objID in self.positions[obj]), None)
+        objName, objPos  = next(((obj, pos[objID]) for (obj, pos) in self.positions.items() if objID in self.positions[obj]), None)
         colour = objName.split('_')[1]
         _, goalPosDict = next(((obj, pos) for (obj, pos) in self.positions.items() if f'goal_{colour}' in obj), None)
         goalPos, = goalPosDict.values()
         return self.calculateDistance(objPos[:2], goalPos[:2])
-    
+
     def getDistRobToGoal(self, objID):
         objName, _ = next(((obj, pos[objID]) for (obj, pos) in self.positions.items() if objID in self.positions[obj]), None)
         colour = objName.split('_')[1]
@@ -199,8 +200,8 @@ class CalcReward():
         key1 = None
 
         # Normalize robot position
-        norm_robot_x = self.handleEnv.normalize(robotState[0], self.handleEnv.hO.tableCords['x'][0], self.handleEnv.hO.tableCords['x'][1])
-        norm_robot_y = self.handleEnv.normalize(robotState[1], self.handleEnv.hO.tableCords['y'][0], self.handleEnv.hO.tableCords['y'][1])
+        norm_robot_x = self.handleEnv.normalize(robotState[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+        norm_robot_y = self.handleEnv.normalize(robotState[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
         robotState = [norm_robot_x, norm_robot_y]
 
         # Find nearest object and normalize its position
@@ -210,16 +211,16 @@ class CalcReward():
                 key1 = key
 
         if key1:
-            nearestObjectState[0] = self.handleEnv.normalize(nearestObjectState[0], self.handleEnv.hO.tableCords['x'][0], self.handleEnv.hO.tableCords['x'][1])
-            nearestObjectState[1] = self.handleEnv.normalize(nearestObjectState[1], self.handleEnv.hO.tableCords['y'][0], self.handleEnv.hO.tableCords['y'][1])
+            nearestObjectState[0] = self.handleEnv.normalize(nearestObjectState[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+            nearestObjectState[1] = self.handleEnv.normalize(nearestObjectState[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
         
             # Find the goal corresponding to the object's color and normalize its position
             colour = key1.split('_')[1]
             _, goalPosDict = next(((obj, pos) for (obj, pos) in self.positions.items() if f'goal_{colour}' in obj), None)
             if goalPosDict:
                 goalPos, = goalPosDict.values()
-                nearestGoalState[0] = self.handleEnv.normalize(goalPos[0], self.handleEnv.hO.tableCords['x'][0], self.handleEnv.hO.tableCords['x'][1])
-                nearestGoalState[1] = self.handleEnv.normalize(goalPos[1], self.handleEnv.hO.tableCords['y'][0], self.handleEnv.hO.tableCords['y'][1])
+                nearestGoalState[0] = self.handleEnv.normalize(goalPos[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+                nearestGoalState[1] = self.handleEnv.normalize(goalPos[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
 
         return np.concatenate([robotState, nearestObjectState, nearestGoalState])
 
@@ -256,7 +257,7 @@ if __name__ == "__main__":
     hEnv.spawnGoals()
     hEnv.spawnObjects()
 
-    calcRew = CalcReward(hEnv)
+    calcRew = CalcReward(config, hEnv)
 
     reward = calcRew.calcReward()
     print(f"Calculated reward: {reward}")

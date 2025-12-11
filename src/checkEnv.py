@@ -14,7 +14,7 @@ with open("src/config.yml", 'r') as stream:
     config = yaml.safe_load(stream)
 hO = HandleObjects(config)
 hE = HandleEnvironment(config, hO)
-calcR = CalcReward(hE)
+calcR = CalcReward(config, hE)
 env = svpEnv(config, hE, calcR)
 
 

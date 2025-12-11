@@ -74,5 +74,5 @@ if __name__ == "__main__":
 	handleEnv = HandleEnvironment(config, handleObjects)
 	handleEnv.spawnGoals()
 	handleEnv.spawnObjects()
-	calcReward = CalcReward(handleEnv)
+	calcReward = CalcReward(config, handleEnv)
 	sortingEnv = sortingViaPushingEnv(config, handleEnv, calcReward)

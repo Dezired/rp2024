@@ -76,6 +76,7 @@ class HandleEnvironment():
         return (value - midpoint) / (max_val - midpoint)
 
     #def getStates(self):
+    # # attention rework tableCords
     #    '''Returns normalized, flattened list as observation for robot, objects, and goals.'''
     #    objectStates, goalStates = [], []
     #    for key, ids in self.IDs.items():
@@ -105,8 +106,8 @@ class HandleEnvironment():
         for main_key, sub_dict in self.positions.items():
             # Roboter hat nur x,y
             if main_key == 'robot':
-                norm_x = self.normalize(sub_dict[0], self.hO.tableCords['x'][0], self.hO.tableCords['x'][1])
-                norm_y = self.normalize(sub_dict[1], self.hO.tableCords['y'][0], self.hO.tableCords['y'][1])
+                norm_x = self.normalize(sub_dict[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+                norm_y = self.normalize(sub_dict[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
                 states.extend([norm_x, norm_y])
             # Alle anderen Einträge sind weitere Dicts
             else:
@@ -116,8 +117,8 @@ class HandleEnvironment():
                         states.extend([0, 0, 0])
                     else:
                         # Ziele und Objekte haben x,y + Winkel (Z-Orientierung)
-                        norm_x = self.normalize(pos[0], self.hO.tableCords['x'][0], self.hO.tableCords['x'][1])
-                        norm_y = self.normalize(pos[1], self.hO.tableCords['y'][0], self.hO.tableCords['y'][1])
+                        norm_x = self.normalize(pos[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
+                        norm_y = self.normalize(pos[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
                         zAngle = pos[2]
                         states.extend([norm_x, norm_y, zAngle])
         return states
@@ -198,8 +199,8 @@ class HandleEnvironment():
     def robotLeavedWorkArea(self):
         '''returns True if robot out of Area''' # TODO
         [robotX, robotY] = self.robot.get_eef_pose().translation[:2]
-        tableX = self.hO.tableCords['x']
-        tableY = self.hO.tableCords['y']
+        tableX = [self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max']]
+        tableY = [self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max']]
         leaved = True
         if robotX < tableX[1] and robotX > tableX[0]: # check x
             if robotY < tableY[1] and robotY > tableY[0]: # check y
