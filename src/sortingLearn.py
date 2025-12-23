@@ -1,5 +1,5 @@
-#from stable_baselines3 import PPO
-#import os
+# from stable_baselines3 import PPO
+# import os
 #from sortingViaPushingEnv import sortingViaPushingEnv as svpEnv
 #
 #TIMESTEPS = 10000
@@ -39,11 +39,13 @@
 
 # python3 -m tensorboard.main --logdir=data/logs
      
-
-from stable_baselines3 import DQN
-import os
+from stable_baselines3 import PPO, A2C
+from handleObjects import HandleObjects
+from handleEnvironment import HandleEnvironment
+from calcReward import CalcReward
 from sortingViaPushingEnv import sortingViaPushingEnv as svpEnv
 import yaml
+import os
 
 with open("src/config.yml", 'r') as stream:
     config = yaml.safe_load(stream)
@@ -56,37 +58,13 @@ if not os.path.exists(logDir):
     os.makedirs(logDir)
 
 # Umgebung initialisieren
-env = svpEnv()
+hO = HandleObjects(config)
+hE = HandleEnvironment(config, hO)
+calcR = CalcReward(config, hE)
+env = svpEnv(config, hE, calcR)
 
-model = DQN('MlpPolicy', 
-    env, 
-    gamma=0.99, 
-    learning_rate=1e-4,  # Stabileres Lernen
-    buffer_size=100000,  # Replay Buffer Größe
-    batch_size=64,  # Standardwert für DQN
-    train_freq=4,  # Training nach jeder 4. Aktion
-    target_update_interval=1000,  # Zielnetzwerk-Update-Intervall
-    exploration_fraction=0.1,  # 10% der Trainingszeit für Exploration
-    exploration_final_eps=0.02,  # Minimaler Explorationswert
-    verbose=1, 
-    tensorboard_log=logDir
-)
-# Model laden
-#model = DQN.load(f"/home/philipp/Documents/repos/rp2024/data/models/DQN/70000.zip",
-#    env, 
-#    gamma=0.99, 
-#    learning_rate=1e-4,  # Stabileres Lernen
-#    buffer_size=100000,  # Replay Buffer Größe
-#    batch_size=64,  # Standardwert für DQN
-#    train_freq=4,  # Training nach jeder 4. Aktion
-#    target_update_interval=1000,  # Zielnetzwerk-Update-Intervall
-#    exploration_fraction=0.1,  # 10% der Trainingszeit für Exploration
-#    exploration_final_eps=0.02,  # Minimaler Explorationswert
-#    verbose=1, 
-#    tensorboard_log=logDir
-#)
+model = A2C('MlpPolicy', env, verbose=1, device='cuda', tensorboard_log=logDir)
 
-# Training
 iters = 0
 while True:
     iters += 1
