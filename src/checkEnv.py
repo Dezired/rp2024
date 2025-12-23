@@ -28,7 +28,7 @@ def moveRobotKeyboard():
         translatedInput = 0
     elif wasdInput == 'a': # left
         translatedInput = 2 
-    elif wasdInput == 'd':
+    elif wasdInput == 'd': # right
         translatedInput = 3
     elif wasdInput == 't':
         manualTermination = True
