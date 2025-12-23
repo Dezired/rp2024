@@ -9,7 +9,14 @@ import numpy as np
 import os
 import time
 import yaml
+from enum import Enum
 
+class MoveDirection(Enum):
+    BACKWARD = 0
+    FORWARD = 1
+    LEFT = 2
+    RIGHT = 3
+    
 class HandleEnvironment():
     def __init__(self, cfg, handleObjects):
         self.urdfPathRobot = os.path.join(cfg['ASSETS_PATH'], 'urdf', 'robot_without_gripper.urdf')
@@ -22,6 +29,15 @@ class HandleEnvironment():
             self.bullet_client.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
         self.cfg = cfg
         self.robot = BulletRobot(bullet_client=self.bullet_client, urdf_path=self.urdfPathRobot)
+        self.mDir = MoveDirection
+
+
+    def reset(self):
+        self.resetEnvironment()
+        self.robotToStartPose()
+        self.spawnGoals()
+        self.spawnObjects()
+        
 
     def resetEnvironment(self):
         self.bullet_client.resetSimulation()
@@ -32,7 +48,7 @@ class HandleEnvironment():
         print("Environment resetted")
 
     def robotToStartPose(self):
-        target_pose = Affine(translation=[0.25, -0.34, -0.1], rotation=[-np.pi, 0, np.pi/2])
+        target_pose = Affine(translation=[0.5, 0.12, -0.1], rotation=[-np.pi, 0, np.pi/2]) # old start pose: [0.25, -0.34, -0.1]
         self.robot.lin(target_pose)
 
     def spawnGoals(self):
@@ -121,7 +137,7 @@ class HandleEnvironment():
                         norm_y = self.normalize(pos[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
                         zAngle = pos[2]
                         states.extend([norm_x, norm_y, zAngle])
-        return states
+        return np.array(states)
 
 
     #def getPositions(self):
@@ -167,33 +183,27 @@ class HandleEnvironment():
         positionDict['robot'] = self.robot.get_eef_pose().translation[:2]
         return positionDict
 
-
-    def performAction(self, action):
+    def performAction(self, action, step_size=0.01, debug=False):
         current_pose = self.robot.get_eef_pose()
-        print(f"Current Pose: {current_pose.translation}, {current_pose.quat}")
+        if debug:
+            print(f"Current Pose: {current_pose.translation}, {current_pose.quat}")
         # Move 1 cm in XY
         dx, dy = {
-            0: (-0.01,  0.0),  # left
-            1: ( 0.01,  0.0),  # right
-            2: ( 0.0,   0.01), # forward
-            3: ( 0.0,  -0.01), # backward
+            0: (-step_size,  0.0),
+            1: ( step_size,  0.0),
+            2: ( 0.0,   step_size),
+            3: ( 0.0,  -step_size),
         }.get(action, (0.0, 0.0))
         if dx == dy == 0.0:
             return
 
-        # OPTION A: keep the current orientation (usually best to avoid IK flips)
-        fixed_quat = current_pose.quat  # xyzw
-
-        # OPTION B: if you truly want a hard-coded tool pose, convert Euler->quat once:
-        # fixed_quat = Rotation.from_euler('xyz', [-np.pi, 0, np.pi/2]).as_quat()  # xyzw
-
         target_pose = Affine(
             translation=[current_pose.translation[0] + dx,
                         current_pose.translation[1] + dy,
-                        -0.1],   # keep z exactly the same
-            rotation=fixed_quat
+                        self.cfg['TABLE_CORDS']['z']],   # keep z exactly the same 
+            rotation= [-np.pi, 0, np.pi/2] # keep tcp straight to ground
         )
-        self.robot.lin(target_pose)
+        self.robot.lin(target_pose) # or robot.ptp(target_pose)
     
 
     def robotLeavedWorkArea(self):
