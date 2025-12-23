@@ -23,20 +23,22 @@ class sortingViaPushingEnv(gym.Env):
 
 	def step(self, action):
 		self.hdlEnv.performAction(action)
+		observation = self.hdlEnv.getStates()
+		self.stepCount += 1
+
 		self.terminated = self.calcReward.taskFinished()
 		if self.hdlEnv.checkMisbehaviour():
 			self.terminated = True
 			self.reward = -1000
+		elif self.calcReward.taskFinished():
+			self.terminated = True
+			self.reward = 1000
 		else:
 			self.reward = self.calcReward.calcReward()
 		if self.stepCount >= self.cfg['MAX_STEPS']-1:
 			self.truncated = True
-		info = {'Step': self.stepCount, 'Reward': self.reward, 'Action': action, 'Terminated': self.terminated, 'Truncated': self.truncated}
+		info = {'Step': self.stepCount, 'Reward': self.reward, 'Action': self.hdlEnv.mDir(action).name, 'Terminated': self.terminated, 'Truncated': self.truncated}
 		pprint(info)
-		self.stepCount += 1
-		observation = self.hdlEnv.getStates()
-		#observation = self.calcReward.getStatePositions()
-		
 
 		return observation, self.reward, self.terminated, self.truncated, info
 	
@@ -46,10 +48,7 @@ class sortingViaPushingEnv(gym.Env):
 		self.terminated = False
 		self.truncated  = False
 		self.prevReward = 0
-		self.hdlEnv.resetEnvironment()
-		self.hdlEnv.robotToStartPose()
-		self.hdlEnv.spawnGoals()
-		self.hdlEnv.spawnObjects()
+		self.hdlEnv.reset()
 		self.calcReward.reset()
 		
         # create observation
