@@ -9,19 +9,20 @@ PARTS:
   # - plus
   - cube
 ROBOT_STATE_COUNT: 2 # x and y
-OBJECT_STATE_COUNT: 4 # x, y and rotation arround z (sin+cos)
-GOAL_STATE_COUNT: 4 # x, y and rotation arround z (sin+cos)
+OBJECT_STATE_COUNT: 3 # x, y and rotation arround z
+GOAL_STATE_COUNT: 3 # x, y and rotation arround z
 MAX_OBJECT_PER_TYPE: 1
 TABLE_CORDS:
-  x_min: 0.3
+  x_min: 0.52 # 0.3
   x_max: 0.9
   y_min: -0.29
   y_max: 0.29
+  z: -0.1
 
 # Train
 MAX_STEPS: 200
 TIMESTEPS: 10000
-MODEL: "DQN_normiert_small_observationspace_corrected_padding"
+MODEL: "A2C"
 
 # Simulation
 RENDER: true
