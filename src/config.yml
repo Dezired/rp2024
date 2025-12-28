@@ -3,11 +3,11 @@ COLOURS:
   - green
   # - red
 OBJECT_FOLDERS:
-  # - signs
   - cubes
+  # - signs
 PARTS:
-  # - plus
   - cube
+  # - plus
 ROBOT_STATE_COUNT: 2 # x and y
 OBJECT_STATE_COUNT: 3 # x, y and rotation arround z
 GOAL_STATE_COUNT: 3 # x, y and rotation arround z
