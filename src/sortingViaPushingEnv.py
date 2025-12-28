@@ -53,8 +53,6 @@ class sortingViaPushingEnv(gym.Env):
 		
         # create observation
 		observation = self.hdlEnv.getStates() # robot state, object state, goal state (x,y|x,y,degZ|x,y,degZ)
-		#observation = self.calcReward.getStatePositions()
-
 		info = {}
 
 		print("SortingViaPushingEnv resetted")
