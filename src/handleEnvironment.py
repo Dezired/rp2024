@@ -86,11 +86,16 @@ class HandleEnvironment():
     def getIDs(self):
         return self.IDs          
 
-    def normalize(self, value, min_val, max_val):
-        """Normalize a value to the range [-1, 1] with respect to the midpoint."""
-        midpoint = (min_val + max_val) / 2
-        return (value - midpoint) / (max_val - midpoint)
-
+    def normalize(self, xVal, yVal, off=0.05):
+        """Normalize a point to the range [-1, 1] with respect to the midpoint."""
+        min_val_x, max_val_x = self.cfg['TABLE_CORDS']['x_min']-off, self.cfg['TABLE_CORDS']['x_max']+off
+        min_val_y, max_val_y = self.cfg['TABLE_CORDS']['y_min']-off, self.cfg['TABLE_CORDS']['y_max']+off
+        midpoint_x = (min_val_x + max_val_x) / 2
+        midpoint_y = (min_val_y + max_val_y) / 2
+        xN =  (xVal - midpoint_x) / (max_val_x - midpoint_x)
+        yN =  (yVal - midpoint_y) / (max_val_y - midpoint_y)
+        return xN, yN
+    
     #def getStates(self):
     # # attention rework tableCords
     #    '''Returns normalized, flattened list as observation for robot, objects, and goals.'''
@@ -118,28 +123,27 @@ class HandleEnvironment():
     def getStates(self):
         """Returns normalized, flattened list as observation for robot, objects, and goals."""
         self.positions = self.getPositions()
-        states = []
-        for main_key, sub_dict in self.positions.items():
-            # Roboter hat nur x,y
-            if main_key == 'robot':
-                norm_x = self.normalize(sub_dict[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
-                norm_y = self.normalize(sub_dict[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
-                states.extend([norm_x, norm_y])
-            # Alle anderen Einträge sind weitere Dicts
-            else:
-                for _, pos in sub_dict.items():
-                    # Dummy-Einträge mit None sollen zu [0,0,0] werden
-                    if (isinstance(sub_dict, str) and sub_dict.startswith("dummy_")) or any(v is None for v in pos):
-                        states.extend([0, 0, 0])
-                    else:
-                        # Ziele und Objekte haben x,y + Winkel (Z-Orientierung)
-                        norm_x = self.normalize(pos[0], self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max'])
-                        norm_y = self.normalize(pos[1], self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max'])
-                        zAngle = pos[2]
-                        states.extend([norm_x, norm_y, zAngle])
-        return np.array(states)
-
-
+        goals = [] 
+        objects = []
+        for key, item in self.positions.items():
+            if key == 'robot':
+                robX, robY = item
+                robXn, robYn = self.normalize(robX, robY)
+            elif key.startswith('goal_'):
+                for val in item.values():
+                    goalX, goalY, goalZ = val
+                    goalXn, goalYn = self.normalize(goalX, goalY)
+                    goals.extend([goalXn, goalYn, goalZ])
+            else: # objects
+                for val in item.values():
+                    objX, objY, objZ = val
+                    objXn, objYn = self.normalize(objX, objY)
+                    objects.extend([objXn, objYn, objZ])
+        states = [robXn, robYn]
+        states.extend(objects)
+        states.extend(goals)
+        return np.array(states)    
+    
     #def getPositions(self):
     #    '''returns dict with nested list for dealing with position of robot, objects and goals individualy'''
     #    positionDict = {}
