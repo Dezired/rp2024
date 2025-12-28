@@ -238,7 +238,20 @@ class HandleEnvironment():
         if misbehaviour==True:
             print(f"Misbehaviour: {misbehaviour}")
         return misbehaviour
-        
+
+
+def drawStates(states):
+    robotX, robotY, objX, objY, objZ, goalX, goalY, objZ = states
+    # draw in with matplotlib
+    import matplotlib.pyplot as plt
+    plt.clf()
+    plt.xlim(-1, 1)
+    plt.ylim(-1, 1)
+    plt.plot(robotX, robotY, 'bo', label='Robot')
+    plt.plot(objX, objY, 'ro', label='Object')
+    plt.plot(goalX, goalY, 'go', label='Goal')
+    plt.legend()
+    plt.show()
 
 if __name__ == '__main__':
     from pprint import pprint
@@ -263,4 +276,7 @@ if __name__ == '__main__':
     states = hEnv.getStates()
     print('States:')
     pprint(states)
+    drawStates(states)
+    input("Press Enter to continue...")
+
 
