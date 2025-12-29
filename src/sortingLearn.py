@@ -51,11 +51,11 @@ with open("src/config.yml", 'r') as stream:
     config = yaml.safe_load(stream)
 
 modelsDir = f"/home/philipp/Documents/repos/rp2024/data/models/{config['MODEL']}"
-if not os.path.exists(modelsDir):
-    os.makedirs(modelsDir)
 logDir = "/home/philipp/Documents/repos/rp2024/data/logs"
-if not os.path.exists(logDir):
-    os.makedirs(logDir)
+evalDir = "/home/philipp/Documents/repos/rp2024/data/evals"
+os.makedirs(modelsDir, exist_ok=True)
+os.makedirs(logDir, exist_ok=True)
+os.makedirs(evalDir, exist_ok=True)
 
 # Umgebung initialisieren
 hO = HandleObjects(config)
