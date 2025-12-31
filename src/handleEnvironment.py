@@ -18,12 +18,14 @@ class MoveDirection(Enum):
     RIGHT = 3
     
 class HandleEnvironment():
-    def __init__(self, cfg, handleObjects):
+    def __init__(self, cfg, handleObjects, connection_mode=None):
         self.urdfPathRobot = os.path.join(cfg['ASSETS_PATH'], 'urdf', 'robot_without_gripper.urdf')
         self.urdfPathGoal = os.path.join(cfg['ASSETS_PATH'], 'objects', 'goals')
         self.hO = handleObjects
         self.IDs = {}
-        self.bullet_client = BulletClient(connection_mode=p.GUI)
+        if connection_mode is None:
+            connection_mode = p.GUI if cfg.get("RENDER", False) else p.DIRECT
+        self.bullet_client = BulletClient(connection_mode=connection_mode)
         self.bullet_client.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         if not cfg['RENDER']:
             self.bullet_client.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
