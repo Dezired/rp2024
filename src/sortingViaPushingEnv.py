@@ -35,6 +35,7 @@ class sortingViaPushingEnv(gym.Env):
 			self.reward = 1000
 		else:
 			self.reward = self.calcReward.calcReward()
+		self.truncated = False
 		if self.stepCount >= self.cfg['MAX_STEPS']-1:
 			self.truncated = True
 		info = {'Step': self.stepCount, 'Reward': self.reward, 'Action': self.hdlEnv.mDir(action).name, 'Terminated': self.terminated, 'Truncated': self.truncated}
