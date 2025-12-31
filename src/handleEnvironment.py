@@ -218,10 +218,10 @@ class HandleEnvironment():
         tableX = [self.cfg['TABLE_CORDS']['x_min'], self.cfg['TABLE_CORDS']['x_max']]
         tableY = [self.cfg['TABLE_CORDS']['y_min'], self.cfg['TABLE_CORDS']['y_max']]
         leaved = True
-        if robotX < tableX[1] and robotX > tableX[0]: # check x
+        if robotX < tableX[1] and robotX > tableX[0]-2.2: # check x
             if robotY < tableY[1] and robotY > tableY[0]: # check y
                 leaved = False
-        return False # TODO activate with returning leaved
+        return leaved # DEBUG: False
 
     def objectOffTable(self):
         for key , values in self.IDs.items():
