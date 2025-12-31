@@ -21,9 +21,13 @@ TABLE_CORDS:
 
 # Train
 MAX_STEPS: 200
-TIMESTEPS: 10000
+TIMESTEPS: 100000
 MODEL: "A2C"
+NUM_CPU: 12
+EVAL_FREQ: 500
+EVAL_EPS: 5
 
 # Simulation
 RENDER: true
 ASSETS_PATH: "/home/philipp/Documents/repos/rp2024/assets"
+
