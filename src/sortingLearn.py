@@ -40,12 +40,19 @@
 # python3 -m tensorboard.main --logdir=data/logs
      
 from stable_baselines3 import PPO, A2C
+from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.utils import set_random_seed
+# from stable_baselines3.common.env_util import make_vec_env # not used bc custom env -> func. make_env() instead created
+from stable_baselines3.common.callbacks import EvalCallback
+
 from handleObjects import HandleObjects
 from handleEnvironment import HandleEnvironment
 from calcReward import CalcReward
-from sortingViaPushingEnv import sortingViaPushingEnv as svpEnv
+from sortingViaPushingEnv import sortingViaPushingEnv as SvpEnv
+
 import yaml
 import os
+import pybullet as p
 
 with open("src/config.yml", 'r') as stream:
     config = yaml.safe_load(stream)
@@ -53,21 +60,40 @@ with open("src/config.yml", 'r') as stream:
 modelsDir = f"/home/philipp/Documents/repos/rp2024/data/models/{config['MODEL']}"
 logDir = "/home/philipp/Documents/repos/rp2024/data/logs"
 evalDir = "/home/philipp/Documents/repos/rp2024/data/evals"
+run_name = f"{config['MODEL']}_test"
+evalLogDir = os.path.join(evalDir, run_name)
 os.makedirs(modelsDir, exist_ok=True)
 os.makedirs(logDir, exist_ok=True)
-os.makedirs(evalDir, exist_ok=True)
+os.makedirs(evalLogDir, exist_ok=True)
 
-# Umgebung initialisieren
-hO = HandleObjects(config)
-hE = HandleEnvironment(config, hO)
-calcR = CalcReward(config, hE)
-env = svpEnv(config, hE, calcR)
+def make_env(rank: int, seed: int = 0, render: bool = False):
+    def _init():
+        hO = HandleObjects(config)
+        hE = HandleEnvironment(config, hO, connection_mode=p.DIRECT if not render else p.GUI)      # deactivate gui for subprocesses
+        cR = CalcReward(config, hE)
 
-model = A2C('MlpPolicy', env, verbose=1, device='cuda', tensorboard_log=logDir)
+        env = SvpEnv(config, hE, cR)
+        env.reset(seed=seed + rank)
+        return env
+    set_random_seed(seed)
+    return _init
 
-iters = 0
-while True:
-    iters += 1
-    model.learn(total_timesteps=config['TIMESTEPS'], reset_num_timesteps=False, tb_log_name=config['MODEL'])
-    model.save(f"{modelsDir}/{config['TIMESTEPS'] * iters}")
+if __name__ == "__main__": # use because of subprocesses
+    env = SubprocVecEnv([make_env(i) for i in range(config['NUM_CPU'])])
+    eval_env = SubprocVecEnv([make_env(0, seed=1000, render=True)])  # single eval env
+    eval_callback = EvalCallback(eval_env=eval_env, best_model_save_path=evalLogDir, log_path=evalLogDir, eval_freq=max(config['EVAL_FREQ']//config['NUM_CPU'],1), # TODO: evalDir mayby to logs dir?
+                                n_eval_episodes=config['EVAL_EPS'], deterministic=True,
+                                render=True)
+
+
+    model = A2C('MlpPolicy', env, verbose=1, device='cuda', tensorboard_log=logDir)
+
+
+    model.learn(total_timesteps=config['TIMESTEPS'], tb_log_name=run_name, callback=eval_callback)
+
+    # iters = 0
+    # while True:
+    #     iters += 1
+    #     model.learn(total_timesteps=config['TIMESTEPS'], reset_num_timesteps=False, tb_log_name=config['MODEL'])
+    #     model.save(f"{modelsDir}/{config['TIMESTEPS'] * iters}")
 
